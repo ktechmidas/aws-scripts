@@ -1,0 +1,34 @@
+#cloud-config
+
+coreos:
+  units:
+    - name: etcd.service
+      command: start
+    - name: fleet.service
+      command: start
+    - name: get-git.service
+      command: start
+      content: |
+        [Unit]
+        Description=Initialise by getting stuff from Git.
+        [Service]
+        ExecStart=/usr/bin/git clone git@(GITHOST):root/Dockerinit.git /root/dockerfiles/
+write_files:
+    - path: /root/.ssh/config
+      permissions: 600
+      owner: root
+      content: |
+        Host (GITHOST)
+        IdentityFile ~/.ssh/monotoko.key 
+    - path: /root/.ssh/monotoko.key
+      permissions: 600
+      owner: root
+      content: |
+        -----BEGIN RSA PRIVATE KEY-----
+        (PRIVKEY)
+		-----END RSA PRIVATE KEY-----
+    - path: /root/.ssh/known_hosts
+      permissions: 600
+      owner: root
+      content: |
+        149.202.136.92 ssh-rsa (HOSTKEY) 
